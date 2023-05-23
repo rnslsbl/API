@@ -2,15 +2,14 @@
 using API.Contracts;
 using API.Models;
 
-namespace API.Repositories; 
-    public class AccountRoleRepository : IAccountRoleRepository
+namespace API.Repositories;
+public class AccountRoleRepository : GenericRepository<AccountRole>, IAccountRoleRepository
 {
-    private readonly BookingManagementDbContext _context;
-    public AccountRoleRepository(BookingManagementDbContext context)
-    {
-        _context = context;
-    }
 
+    public AccountRoleRepository(BookingManagementDbContext context) : base(context) { }
+
+
+/*
     public AccountRole Create(AccountRole accountRole)
     {
         try
@@ -65,5 +64,5 @@ namespace API.Repositories;
     public AccountRole? GetByGuid(Guid guid)
     {
         return _context.Set<AccountRole>().Find(guid);
-    }
+    }*/
 }

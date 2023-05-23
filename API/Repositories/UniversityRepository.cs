@@ -3,10 +3,16 @@ using API.Models;
 using API.Contracts;
 
 namespace API.Repositories; 
-    public class UniversityRepository : IUniversityRepository
+    public class UniversityRepository : GenericRepository<University>, IUniversityRepository
+{
+      public UniversityRepository(BookingManagementDbContext context) : base(context) { }
+
+    public IEnumerable<University> GetByName(string name)
     {
-        private readonly BookingManagementDbContext _context;
-        public UniversityRepository(BookingManagementDbContext context)
+        return _context.Set<University>().Where(u => u.Name.Contains(name));
+    }
+
+    /* public UniversityRepository(BookingManagementDbContext context) : base(context) { }
         {
             _context = context;
         }
@@ -65,5 +71,5 @@ namespace API.Repositories;
         public University? GetByGuid (Guid guid)
         {
             return _context.Set<University>().Find(guid);
-        }
-    }
+        }*/
+}

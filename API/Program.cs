@@ -1,7 +1,10 @@
 using API.Contexts;
 using API.Contracts;
+using API.Models;
+using API.Utility;
 using API.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +26,8 @@ builder.Services.AddScoped<IEducationRepository, EducationRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+
+builder.Services.AddSingleton(typeof(IMapper<,>), typeof(Mapper<,>));
 
 
 

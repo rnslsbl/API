@@ -1,5 +1,9 @@
 ﻿using API.Contracts;
 using API.Models;
+using API.Repositories;
+using API.Utility;
+using API.ViewModels.Accounts;
+using API.ViewModels.Employees;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -9,11 +13,14 @@ public class EmployeeController : ControllerBase
 {
 
     private readonly IEmployeeRepository _employeeRepository;
-    public EmployeeController(IEmployeeRepository employeeRepository)
+    private readonly IMapper<Employee, EmployeeVM> _mapper;
+
+    public EmployeeController(IEmployeeRepository employeeRepository, IMapper<Employee, EmployeeVM> mapper)
     {
         _employeeRepository = employeeRepository;
-    }
+        _mapper = mapper;
 
+    }
     [HttpGet]
     public IActionResult GetAll()
     {
@@ -23,7 +30,8 @@ public class EmployeeController : ControllerBase
             return NotFound();
         }
 
-        return Ok(employees);
+        var data = employees.Select(_mapper.Map).ToList();
+        return Ok(data);
     }
 
     [HttpGet("{guid}")]
@@ -35,13 +43,15 @@ public class EmployeeController : ControllerBase
             return NotFound();
         }
 
-        return Ok(employee);
+        var data = _mapper.Map(employee);
+        return Ok(data);
     }
 
     [HttpPost]
-    public IActionResult Create(Employee employee)
+    public IActionResult Create(EmployeeVM employeeVM)
     {
-        var result = _employeeRepository.Create(employee);
+        var employeeConverted = _mapper.Map(employeeVM);
+        var result = _employeeRepository.Create(employeeConverted);
         if (result is null)
         {
             return BadRequest();
@@ -51,9 +61,10 @@ public class EmployeeController : ControllerBase
     }
 
     [HttpPut]
-    public IActionResult Update(Employee employee)
+    public IActionResult Update(EmployeeVM employeeVM)
     {
-        var isUpdated = _employeeRepository.Update(employee);
+        var employeeConverted = _mapper.Map(employeeVM);
+        var isUpdated = _employeeRepository.Update(employeeConverted);
         if (!isUpdated)
         {
             return BadRequest();

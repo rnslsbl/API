@@ -1,14 +1,13 @@
 ﻿using API.Contexts;
 using API.Models;
 using API.Contracts;
+using API.Repositories;
 
-public class BookingRepository :IBookingRepository
-    {
-    private readonly BookingManagementDbContext _context;
-        public BookingRepository(BookingManagementDbContext context)
-        {
-            _context = context;
-        }
+public class BookingRepository : GenericRepository<Booking>, IBookingRepository
+{
+        public BookingRepository(BookingManagementDbContext context) : base(context) { }
+
+/*
     public Booking Create(Booking booking)
     {
         try
@@ -63,6 +62,6 @@ public class BookingRepository :IBookingRepository
     public Booking? GetByGuid(Guid guid)
     {
         return _context.Set<Booking>().Find(guid);
-    }
+    }*/
 }
 

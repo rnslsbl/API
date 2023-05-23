@@ -3,14 +3,15 @@ using API.Models;
 using API.Contracts;
 
 namespace API.Repositories;
-public class EmployeeRepository : IEmployeeRepository
+public class EmployeeRepository : GenericRepository<Employee>, IEmployeeRepository
 {
-    private readonly BookingManagementDbContext _context;
-    public EmployeeRepository(BookingManagementDbContext context)
-    {
-        _context = context;
-    }
+    //private readonly BookingManagementDbContext _context;
+    public EmployeeRepository(BookingManagementDbContext context) : base(context) { }
 
+
+ 
+}
+/*
     public Employee Create(Employee employee)
     {
         try
@@ -66,4 +67,4 @@ public class EmployeeRepository : IEmployeeRepository
     {
         return _context.Set<Employee>().Find(guid);
     }
-}
+}*/

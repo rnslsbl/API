@@ -3,14 +3,12 @@ using API.Models;
 using API.Contracts;
 
 namespace API.Repositories;
-public class RoleRepository : IRoleRepository
+public class RoleRepository : GenericRepository<Role>, IRoleRepository
 {
-    private readonly BookingManagementDbContext _context;
-    public RoleRepository(BookingManagementDbContext context)
-    {
-        _context = context;
-    }
+ 
+    public RoleRepository(BookingManagementDbContext context) : base(context) { }
 
+/*
     public Role Create(Role role)
     {
         try
@@ -65,5 +63,5 @@ public class RoleRepository : IRoleRepository
     public Role? GetByGuid(Guid guid)
     {
         return _context.Set<Role>().Find(guid);
-    }
+    }*/
 }

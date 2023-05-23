@@ -3,15 +3,17 @@ using API.Models;
 using API.Contracts;
 
 namespace API.Repositories;
-    public class EducationRepository : IEducationRepository
+public class EducationRepository : GenericRepository<Education>, IEducationRepository
+{
+   
+    public EducationRepository(BookingManagementDbContext context) : base(context) { }
+
+    public IEnumerable<Education> GetByUniversityId(Guid universityId)
     {
-    private readonly BookingManagementDbContext _context;
-    public EducationRepository(BookingManagementDbContext context)
-    {
-        _context = context;
+        return _context.Set<Education>().Where(e => e.UniversityGuid == universityId);
     }
 
-    public Education Create(Education education)
+    /*public Education Create(Education education)
     {
         try
         {
@@ -65,6 +67,6 @@ namespace API.Repositories;
     public Education? GetByGuid(Guid guid)
     {
         return _context.Set<Education>().Find(guid);
-    }
+    }*/
 }
 

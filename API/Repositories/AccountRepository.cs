@@ -4,15 +4,16 @@ using API.Models;
 
 namespace API.Repositories;
 
-public class AccountRepository : IAccountRepository
+public class AccountRepository : GenericRepository<Account>, IAccountRepository
 {
-        private readonly BookingManagementDbContext _context;
-        public AccountRepository(BookingManagementDbContext context)
-        {
-            _context = context;
-        }
 
-        public Account Create(Account account)
+    public AccountRepository(BookingManagementDbContext context) : base(context) { }
+
+
+
+/*
+GAPERLU
+    public Account Create(Account account)
         {
             try
             {
@@ -66,6 +67,6 @@ public class AccountRepository : IAccountRepository
         public Account? GetByGuid(Guid guid)
         {
             return _context.Set<Account>().Find(guid);
-        }
+        }*/
     }
 

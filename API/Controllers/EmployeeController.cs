@@ -86,5 +86,31 @@ public class EmployeeController : ControllerBase
 
         return Ok();
     }
+    //k1
+    [HttpGet("GetAllMasterEmployee")]
+    public IActionResult GetAllMasterEmployee()
+    {
+        var masterEmployees = _employeeRepository.GetAllMasterEmployee();
+        if (!masterEmployees.Any())
+        {
+            return NotFound();
+        }
+
+        return Ok(masterEmployees);
+    }
+
+    [HttpGet("GetMasterEmployeeByGuid")]
+    public IActionResult GetMasterEmployeeByGuid(Guid guid)
+    {
+        var masterEmployees = _employeeRepository.GetMasterEmployeeByGuid(guid);
+        if (masterEmployees is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(masterEmployees);
+    }
+
+    // End Kel 1
 }
 

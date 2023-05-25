@@ -4,9 +4,11 @@ using API.ViewModels.Rooms;
 namespace API.Contracts;
 public interface IRoomRepository : IGenericRepository<Room>
 {
-  
-   // RoomBookedTodayVM GetRoomByGuid(Guid guid);
+ 
     IEnumerable<RoomBookedTodayVM> GetAvailableRoom();
+    //k1
+    IEnumerable<MasterRoomVM> GetByDate(DateTime dateTime);
+    IEnumerable<RoomUsedVM> GetCurrentlyUsedRooms();
 
 }
 

@@ -104,5 +104,48 @@ public class RoomController : ControllerBase
             return Ok("Ada error");
         }
     }
+
+    //k1
+    [HttpGet("CurrentlyUsedRooms")]
+    public IActionResult GetCurrentlyUsedRooms()
+    {
+        var room = _roomRepository.GetCurrentlyUsedRooms();
+        if (room is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(room);
+    }
+
+    [HttpGet("CurrentlyUsedRoomsByDate")]
+    public IActionResult GetCurrentlyUsedRooms(DateTime dateTime)
+    {
+        var room = _roomRepository.GetByDate(dateTime);
+        if (room is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(room);
+    }
+
+    private string GetRoomStatus(Booking booking, DateTime dateTime)
+    {
+
+        if (booking.StartDate <= dateTime && booking.EndDate >= dateTime)
+        {
+            return "Occupied";
+        }
+        else if (booking.StartDate > dateTime)
+        {
+            return "Booked";
+        }
+        else
+        {
+            return "Available";
+        }
+    }
+    // End Kelompok 1
 }
 

@@ -5,6 +5,8 @@ namespace API.Contracts;
     {
 
     IEnumerable<Education> GetByUniversityId (Guid universityId);
-
+   
+    //k2
+    Education GetByEmployeeId(Guid employeeId);
 }
 

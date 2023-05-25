@@ -7,5 +7,8 @@ namespace API.Contracts;
     //k1
     IEnumerable<MasterEmployeeVM> GetAllMasterEmployee();
     MasterEmployeeVM? GetMasterEmployeeByGuid(Guid guid);
+
+    //k2
+    int CreateWithValidate(Employee employee);
 }
 

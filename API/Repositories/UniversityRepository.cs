@@ -2,74 +2,40 @@
 using API.Models;
 using API.Contracts;
 
-namespace API.Repositories; 
-    public class UniversityRepository : GenericRepository<University>, IUniversityRepository
+namespace API.Repositories;
+public class UniversityRepository : GenericRepository<University>, IUniversityRepository
 {
-      public UniversityRepository(BookingManagementDbContext context) : base(context) { }
+    public UniversityRepository(BookingManagementDbContext context) : base(context) { }
 
     public IEnumerable<University> GetByName(string name)
     {
         return _context.Set<University>().Where(u => u.Name.Contains(name));
     }
-
-    /* public UniversityRepository(BookingManagementDbContext context) : base(context) { }
+    //k2
+    public University CreateWithValidate(University university)
+    {
+        try
         {
-            _context = context;
-        }
+            var existingUniversityWithCode = _context.Universities.FirstOrDefault(u => u.Code == university.Code);
+            var existingUniversityWithName = _context.Universities.FirstOrDefault(u => u.Name == university.Name);
 
-        public University Create (University university)
-        {
-            try
+            if (existingUniversityWithCode != null & existingUniversityWithName != null)
             {
-                _context.Set<University>().Add(university);
+                university.Guid = existingUniversityWithCode.Guid;
+
                 _context.SaveChanges();
-                return university;
-            }
-            catch
-            {
-                return new University();
-            }
-        }
-        public bool Update (University university)
-        {
-            try
-            {
-                _context.Set<University>().Update(university);
-                _context.SaveChanges();
-                return true;
-            } 
-            catch
-            {
-                return false;
-            }
-        }
-        public bool Delete(Guid guid)
-        {
-            try
-            {
-                var university = GetByGuid(guid);
-                if (university == null)
-                {
-                    return false;
-                }
-                _context.Set<University>().Remove(university);
-                _context.SaveChanges();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
 
-        public IEnumerable<University> GetAll()
-        {
-            return _context.Set<University>().ToList();
+            }
+
+            Create(university);
+
+            return university;
 
         }
-
-        public University? GetByGuid (Guid guid)
+        catch
         {
-            return _context.Set<University>().Find(guid);
-        }*/
+            return null;
+        }
+    }
+
 }

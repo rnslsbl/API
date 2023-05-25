@@ -81,4 +81,33 @@ public class EmployeeRepository : GenericRepository<Employee>, IEmployeeReposito
 
     }
     //end k1
+
+    //k2
+    public int CreateWithValidate(Employee employee)
+    {
+        try
+        {
+            bool ExistsByEmail = _context.Employees.Any(e => e.Email == employee.Email);
+            if (ExistsByEmail)
+            {
+                return 1;
+            }
+
+            bool ExistsByPhoneNumber = _context.Employees.Any(e => e.PhoneNumber == employee.PhoneNumber);
+            if (ExistsByPhoneNumber)
+            {
+                return 2;
+            }
+
+            Create(employee);
+            return 3;
+
+        }
+        catch
+        {
+            return 0;
+        }
+    }
+
+    //end k2
 }

@@ -5,5 +5,8 @@ namespace API.Contracts;
     {
 
     IEnumerable<University> GetByName(string name);
+
+    //k2
+    University CreateWithValidate(University university);
 }
 

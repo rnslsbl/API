@@ -23,6 +23,31 @@ public class AccountController : ControllerBase
         _mapper = mapper;
         _employeeRepository = employeeRepository;
     }
+    //k2
+    [HttpPost("Register")]
+
+    public IActionResult Register(RegisterVM registerVM)
+    {
+
+        var result = _accountRepository.Register(registerVM);
+        switch (result)
+        {
+            case 0:
+                return BadRequest("Registration failed");
+            case 1:
+                return BadRequest("Email already exists");
+            case 2:
+                return BadRequest("Phone number already exists");
+            case 3:
+                return Ok("Registration success");
+        }
+
+        return Ok();
+
+    }
+
+    //end k2
+
 
     //k3
     [HttpPost("login")]

@@ -1,69 +1,75 @@
 ﻿using API.Contexts;
-using API.Models;
 using API.Contracts;
+using API.Models;
+using API.ViewModels.Rooms;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using API.ViewModels.Educations;
+using API.ViewModels.Employees;
+using API.ViewModels.Universities;
+using System.Globalization;
+using API.Repositories;
 
 namespace API.Repositories;
-public class RoomRepository : GenericRepository<Room>, IRoomRepository
-{
-    //private readonly BookingManagementDbContext _context;
-
-    public RoomRepository(BookingManagementDbContext context) : base(context) { }
-
-
-    /*
-        public Room Create(Room room)
+    public class RoomRepository : GenericRepository<Room>, IRoomRepository
+    {
+        private readonly IBookingRepository _contextBooking;
+        public RoomRepository(BookingManagementDbContext context, IBookingRepository booking) : base (context)
         {
-            try
-            {
-                _context.Set<Room>().Add(room);
-                _context.SaveChanges();
-                return room;
-            }
-            catch
-            {
-                return new Room();
-            }
+            _contextBooking = booking;
         }
-        public bool Update(Room room)
+
+/*    public RoomBookedTodayVM GetRoomByGuid(Guid bookingGuid)
+    {
+        var entity = _context.Set<RoomBookedTodayVM>().Find(bookingGuid);
+        _context.ChangeTracker.Clear();
+        return entity;
+    }*/
+
+    public IEnumerable<RoomBookedTodayVM> GetAvailableRoom()
         {
             try
             {
-                _context.Set<Room>().Update(room);
-                _context.SaveChanges();
-                return true;
-            }
-            catch
+                //get all data from booking and rooms
+                var booking = _contextBooking.GetAll();
+                var rooms = GetAll();
+
+                var startToday = DateTime.Today;
+                var endToday = DateTime.Today.AddHours(23).AddMinutes(59);
+
+                var roomUse = rooms.Join(booking, Room => Room.Guid, booking => booking.RoomGuid, (Room, booking) => new { Room, booking })
+                        .Select(joinResult => new {
+                            joinResult.Room.Name,
+                            joinResult.Room.Floor,
+                            joinResult.Room.Capacity,
+                            joinResult.booking.StartDate,
+                            joinResult.booking.EndDate
+                        }
+                 );
+
+                var roomUseTodays = new List<RoomBookedTodayVM>();
+           
+
+            foreach (var room in roomUse)
             {
-                return false;
-            }
-        }
-        public bool Delete(Guid guid)
-        {
-            try
-            {
-                var room = GetByGuid(guid);
-                if (room == null)
+                if ((room.StartDate < startToday && room.EndDate < startToday) || (room.StartDate > startToday && room.EndDate > endToday))
                 {
-                    return false;
+                    var roomDay = new RoomBookedTodayVM
+                    {
+                        RoomName = room.Name,
+                        Floor = room.Floor,
+                        Capacity = room.Capacity
+                    };
+                    roomUseTodays.Add(roomDay);
                 }
-                _context.Set<Room>().Remove(room);
-                _context.SaveChanges();
-                return true;
             }
+            return roomUseTodays;
+            }
+
             catch
             {
-                return false;
+                return null;
+
             }
         }
-
-        public IEnumerable<Room> GetAll()
-        {
-            return _context.Set<Room>().ToList();
-
-        }
-
-        public Room? GetByGuid(Guid guid)
-        {
-            return _context.Set<Room>().Find(guid);
-        }*/
-}
+    }

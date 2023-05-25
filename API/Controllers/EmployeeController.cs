@@ -3,6 +3,7 @@ using API.Models;
 using API.Repositories;
 using API.Utility;
 using API.ViewModels.Accounts;
+using API.ViewModels.Educations;
 using API.ViewModels.Employees;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +15,7 @@ public class EmployeeController : ControllerBase
 
     private readonly IEmployeeRepository _employeeRepository;
     private readonly IMapper<Employee, EmployeeVM> _mapper;
+
 
     public EmployeeController(IEmployeeRepository employeeRepository, IMapper<Employee, EmployeeVM> mapper)
     {

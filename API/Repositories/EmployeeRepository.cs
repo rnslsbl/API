@@ -8,8 +8,14 @@ public class EmployeeRepository : GenericRepository<Employee>, IEmployeeReposito
     //private readonly BookingManagementDbContext _context;
     public EmployeeRepository(BookingManagementDbContext context) : base(context) { }
 
+    public Employee GetEmployeeId(Guid bookingId)
+    {
+        var entity = _context.Set<Employee>().Find(bookingId);
+        _context.ChangeTracker.Clear();
+        return entity;
+    }
 
- 
+
 }
 /*
     public Employee Create(Employee employee)

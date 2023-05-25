@@ -10,8 +10,20 @@ public class EducationRepository : GenericRepository<Education>, IEducationRepos
 
     public IEnumerable<Education> GetByUniversityId(Guid universityId)
     {
+
         return _context.Set<Education>().Where(e => e.UniversityGuid == universityId);
+
     }
+
+
+
+
+
+
+
+
+
+
 
     /*public Education Create(Education education)
     {

@@ -43,55 +43,7 @@ namespace API.Controllers
             {
                 return Ok("error");
             }
-            /*if (!bookingDetails.Any())
-            {
-                return NotFound();
-            }*/
-            /*var employeeDetail = _employeeRepository.GetAll();
-            var roomDetail = _roomRepository.GetAll();
-            var results = _bookingRepository.GetAllBookingDetail(bookingDetails, employeeDetail, roomDetail);*/
-
-
-            /* var bookingDetail = from b in bookingDetails
-                                 join e in employeeDetail on b.EmployeeGuid equals e.Guid
-                                 join r in roomDetail on b.RoomGuid equals r.Guid
-                                 select new
-                                 {
-                                     b.Guid,
-                                     e.NIK,
-                                     BookedBy = e.FirstName + " " + e.LastName,
-                                     r.Name,
-                                     b.StartDate,
-                                     b.EndDate,
-                                     b.Status,
-                                     b.Remarks
-                                 };
-
-
-
-         foreach (var booking in bookingDetail)
-         {
-             var result = new BookingDetailVM
-             {
-                 Guid = booking.Guid,
-                 BookedNIK = booking.NIK,
-                 Fullname = booking.BookedBy,
-                 RoomName = booking.Name,
-                 StartDate = booking.StartDate,
-                 EndDate = booking.EndDate,
-                 Status = booking.Status,
-                 Remarks = booking.Remarks
-
-             };
-
-             results.Add(result);
-
-         }*/
-
-
-
-
-        }
+             }
 
         [HttpGet("BookingDetail/{guid}")]
         public IActionResult GetDetailByGuid(Guid guid)
@@ -104,10 +56,6 @@ namespace API.Controllers
 
                     return NotFound();
                 }
-
-                /*var employee = _employeeRepository.GetByGuid(booking.EmployeeGuid);
-                var room = _roomRepository.GetByGuid(booking.RoomGuid);
-                var result = _bookingRepository.GetBookingDetailByGuid(booking, employee, room);*/
 
                 return Ok(booking);
             }
@@ -173,6 +121,19 @@ namespace API.Controllers
                 return BadRequest();
             }
             return Ok();
+        }
+
+        //K3
+        [HttpGet("bookinglength")]
+        public IActionResult GetDuration()
+        {
+            var bookingLengths = _bookingRepository.GetBookingDuration();
+            if (!bookingLengths.Any())
+            {
+                return NotFound();
+            }
+
+            return Ok(bookingLengths);
         }
     }
 }

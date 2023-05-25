@@ -6,7 +6,7 @@ namespace API.Contracts;
     {
     IEnumerable<BookingDetailVM> GetAllBookingDetail();
     BookingDetailVM GetBookingDetailByGuid(Guid guid);
-
-    //IEnumerable<BookingDurationVM> GetBookingDuration();
+    //K3
+    IEnumerable<BookingDurationVM> GetBookingDuration();
 }
 

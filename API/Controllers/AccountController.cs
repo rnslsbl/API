@@ -3,6 +3,7 @@ using API.Models;
 using API.Repositories;
 using API.Utility;
 using API.ViewModels.Accounts;
+using API.ViewModels.Login;
 using API.ViewModels.Universities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,12 +15,34 @@ public class AccountController : ControllerBase
 
     private readonly IAccountRepository _accountRepository;
     private readonly IMapper<Account, AccountVM> _mapper;
+    private readonly IEmployeeRepository _employeeRepository; //k3
 
-    public AccountController(IAccountRepository accountRepository, IMapper<Account, AccountVM> mapper)
+    public AccountController(IAccountRepository accountRepository, IMapper<Account, AccountVM> mapper, IEmployeeRepository employeeRepository)
     {
         _accountRepository = accountRepository;
         _mapper = mapper;
-    
+        _employeeRepository = employeeRepository;
+    }
+
+    //k3
+    [HttpPost("login")]
+
+    public IActionResult Login(LoginVM loginVM)
+    {
+        var account = _accountRepository.Login(loginVM);
+
+        if (account == null)
+        {
+            return NotFound("Account not found");
+        }
+
+        if (account.Password != loginVM.Password)
+        {
+            return BadRequest("Password is invalid");
+        }
+
+        return Ok();
+
     }
 
     [HttpGet]

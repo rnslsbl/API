@@ -5,5 +5,6 @@ namespace API.Contracts;
     {
 
     IEnumerable<Education> GetByUniversityId (Guid universityId);
+
 }
 

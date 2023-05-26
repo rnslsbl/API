@@ -3,6 +3,7 @@ using API.Contracts;
 using API.Models;
 using API.ViewModels.Accounts;
 using API.ViewModels.Login;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Repositories;
 
@@ -104,6 +105,7 @@ public class AccountRepository : GenericRepository<Account>, IAccountRepository
 
         return "100000";
     }
+
     //end k2
 
 
@@ -124,63 +126,84 @@ public class AccountRepository : GenericRepository<Account>, IAccountRepository
                     };
         return query.FirstOrDefault();
     }
+    //end k3
 
-    /*
-    GAPERLU
-        public Account Create(Account account)
-            {
-                try
-                {
-                    _context.Set<Account>().Add(account);
-                    _context.SaveChanges();
-                    return account;
-                }
-                catch
-                {
-                    return new Account();
-                }
-            }
-            public bool Update(Account account)
-            {
-                try
-                {
-                    _context.Set<Account>().Update(account);
-                    _context.SaveChanges();
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-            public bool Delete(Guid guid)
-            {
-                try
-                {
-                    var account = GetByGuid(guid);
-                    if (account == null)
-                    {
-                        return false;
-                    }
-                    _context.Set<Account>().Remove(account);
-                    _context.SaveChanges();
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
 
-            public IEnumerable<Account> GetAll()
-            {
-                return _context.Set<Account>().ToList();
+    //k5
+    public int UpdateOTP(Guid? employeeId)
+    {
+        var account = new Account();
+        account = _context.Set<Account>().FirstOrDefault(a => a.Guid == employeeId);
+        //Generate OTP
+        Random rnd = new Random();
+        var getOtp = rnd.Next(100000, 999999);
+        account.OTP = getOtp;
 
+        //Add 5 minutes to expired time
+        account.ExpiredTime = DateTime.Now.AddMinutes(5);
+        account.IsUsed = false;
+        try
+        {
+            var check = Update(account);
+
+
+            if (!check)
+            {
+                return 0;
             }
+            return getOtp;
+        }
+        catch
+        {
+            return 0;
+        }
+    }
+        //end k5
 
-            public Account? GetByGuid(Guid guid)
+        //k6
+
+        public int ChangePasswordAccount(Guid? employeeId, ChangePasswordVM changePasswordVM)
+    {
+        var account = new Account();
+        account = _context.Set<Account>().FirstOrDefault(a => a.Guid == employeeId);
+        if (account == null || account.OTP != changePasswordVM.OTP)
+        {
+            return 2;
+        }
+        // Cek apakah OTP sudah digunakan
+        if (account.IsUsed)
+        {
+            return 3;
+        }
+        // Cek apakah OTP sudah expired
+        if (account.ExpiredTime < DateTime.Now)
+        {
+            return 4;
+        }
+        // Cek apakah NewPassword dan ConfirmPassword sesuai
+        if (changePasswordVM.NewPassword != changePasswordVM.ConfirmPassword)
+        {
+            return 5;
+        }
+        // Update password
+        account.Password = changePasswordVM.NewPassword;
+        account.IsUsed = true;
+        try
+        {
+            var updatePassword = Update(account);
+            if (!updatePassword)
             {
-                return _context.Set<Account>().Find(guid);
-            }*/
+                return 0;
+            }
+            return 1;
+        }
+        catch
+        {
+            return 0;
+        }
+    }
+
+    //end k6
+
 }
 

@@ -3,9 +3,12 @@ using API.Models;
 using API.Repositories;
 using API.Utility;
 using API.ViewModels.Accounts;
+using API.ViewModels.Bookings;
 using API.ViewModels.Educations;
 using API.ViewModels.Employees;
+using API.ViewModels.Others;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace API.Controllers;
 [ApiController]
@@ -29,11 +32,21 @@ public class EmployeeController : ControllerBase
         var employees = _employeeRepository.GetAll();
         if (!employees.Any())
         {
-            return NotFound();
+            return NotFound(new ResponseVM<MasterEmployeeVM>
+            {
+                Code = StatusCodes.Status404NotFound,
+                Status = HttpStatusCode.NotFound.ToString(),
+                Message = "Data Employee Tidak Ditemukan",
+            });
         }
-
-        var data = employees.Select(_mapper.Map).ToList();
-        return Ok(data);
+            var data = employees.Select(_mapper.Map).ToList();
+        return Ok(new ResponseVM<List<EmployeeVM>>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Data Employee Berhasil Ditampilkan",
+            Data = data
+        });
     }
 
     [HttpGet("{guid}")]
@@ -42,11 +55,22 @@ public class EmployeeController : ControllerBase
         var employee = _employeeRepository.GetByGuid(guid);
         if (employee is null)
         {
-            return NotFound();
+            return NotFound(new ResponseVM<EmployeeVM>
+            {
+                Code = StatusCodes.Status404NotFound,
+                Status = HttpStatusCode.NotFound.ToString(),
+                Message = "ID Employee Tidak Ditemukan",
+            });
         }
 
         var data = _mapper.Map(employee);
-        return Ok(data);
+        return Ok(new ResponseVM<Employee>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Employee By Id Berhasil Ditampilkan",
+            Data = employee
+        });
     }
 
     [HttpPost]
@@ -56,10 +80,21 @@ public class EmployeeController : ControllerBase
         var result = _employeeRepository.Create(employeeConverted);
         if (result is null)
         {
-            return BadRequest();
+            return BadRequest(new ResponseVM<EmployeeVM>
+            {
+                Code = StatusCodes.Status400BadRequest,
+                Status = HttpStatusCode.BadRequest.ToString(),
+                Message = "Data Employee Tidak Berhasil Ditambahkan",
+            });
         }
 
-        return Ok(result);
+        return Ok(new ResponseVM<Employee>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Data Employee Berhasil Ditambahkan",
+            Data = result
+        });
     }
 
     [HttpPut]
@@ -69,11 +104,23 @@ public class EmployeeController : ControllerBase
         var isUpdated = _employeeRepository.Update(employeeConverted);
         if (!isUpdated)
         {
-            return BadRequest();
+            return BadRequest(new ResponseVM<EmployeeVM>
+            {
+                Code = StatusCodes.Status400BadRequest,
+                Status = HttpStatusCode.BadRequest.ToString(),
+                Message = "Data Employee Tidak Berhasil Diperbarui",
+            });
         }
 
-        return Ok();
+        return Ok(new ResponseVM<EmployeeVM>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Data Employee Berhasil Diperbarui",
+
+        });
     }
+
 
     [HttpDelete("{guid}")]
     public IActionResult Delete(Guid guid)
@@ -81,10 +128,21 @@ public class EmployeeController : ControllerBase
         var isDeleted = _employeeRepository.Delete(guid);
         if (!isDeleted)
         {
-            return BadRequest();
+            return BadRequest(new ResponseVM<EmployeeVM>
+            {
+                Code = StatusCodes.Status400BadRequest,
+                Status = HttpStatusCode.BadRequest.ToString(),
+                Message = "Data Employee Gagal Dihapus",
+            });
         }
 
-        return Ok();
+        return Ok(new ResponseVM<EmployeeVM>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Data Employee Berhasil Dihapus",
+
+        });
     }
     //k1
     [HttpGet("GetAllMasterEmployee")]
@@ -93,10 +151,21 @@ public class EmployeeController : ControllerBase
         var masterEmployees = _employeeRepository.GetAllMasterEmployee();
         if (!masterEmployees.Any())
         {
-            return NotFound();
+            return NotFound(new ResponseVM<MasterEmployeeVM>
+            {
+                Code = StatusCodes.Status404NotFound,
+                Status = HttpStatusCode.NotFound.ToString(),
+                Message = "Data Employee Tidak Ditemukan",
+            });
         }
 
-        return Ok(masterEmployees);
+        return Ok(new ResponseVM<IEnumerable<MasterEmployeeVM>>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Data Master Employee Berhasil Ditampilkan",
+            Data = masterEmployees
+        });
     }
 
     [HttpGet("GetMasterEmployeeByGuid")]
@@ -105,10 +174,21 @@ public class EmployeeController : ControllerBase
         var masterEmployees = _employeeRepository.GetMasterEmployeeByGuid(guid);
         if (masterEmployees is null)
         {
-            return NotFound();
+            return NotFound(new ResponseVM<MasterEmployeeVM>
+            {
+                Code = StatusCodes.Status404NotFound,
+                Status = HttpStatusCode.NotFound.ToString(),
+                Message = "Data Employee Master Tidak Ditemukan",
+            });
         }
 
-        return Ok(masterEmployees);
+        return Ok(new ResponseVM<MasterEmployeeVM>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Data Master Employee Berhasil Ditampilkan",
+            Data = masterEmployees
+        });
     }
 
     // End Kel 1

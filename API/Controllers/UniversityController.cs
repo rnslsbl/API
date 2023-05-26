@@ -3,8 +3,11 @@ using API.Models;
 using API.Repositories;
 using API.Utility;
 using API.ViewModels.Educations;
+using API.ViewModels.Others;
+using API.ViewModels.Rooms;
 using API.ViewModels.Universities;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace API.Controllers;
 [ApiController]
@@ -31,7 +34,12 @@ public class UniversityController : ControllerBase
         var universities = _universityRepository.GetAll();
         if (!universities.Any())
         {
-            return NotFound();
+            return NotFound(new ResponseVM<UniversityEducationVM>
+            {
+                Code = StatusCodes.Status404NotFound,
+                Status = HttpStatusCode.NotFound.ToString(),
+                Message = "Data University Tidak Ditemukan",
+            });
         }
 
         var results = new List<UniversityEducationVM>();
@@ -52,7 +60,13 @@ public class UniversityController : ControllerBase
             results.Add(result);
         }
 
-        return Ok(results);
+        return Ok(new ResponseVM<IEnumerable<UniversityEducationVM>>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Data Room Berhasil Ditampilkan",
+            Data = results
+        });
     }
 
     [HttpGet]
@@ -61,10 +75,21 @@ public class UniversityController : ControllerBase
         var universities = _universityRepository.GetAll();
         if (!universities.Any())
         {
-            return NotFound();
+            return NotFound(new ResponseVM<UniversityVM>
+            {
+                Code = StatusCodes.Status404NotFound,
+                Status = HttpStatusCode.NotFound.ToString(),
+                Message = "Data University Tidak Ditemukan",
+            });
         }
         var data = universities.Select(_mapper.Map).ToList();
-        return Ok(data);
+        return Ok(new ResponseVM<List<UniversityVM>>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Data University Berhasil Ditampilkan",
+            Data = data
+        });
     }
 
     [HttpGet("{guid}")]
@@ -73,10 +98,21 @@ public class UniversityController : ControllerBase
         var university = _universityRepository.GetByGuid(guid);
         if (university is null)
         {
-            return NotFound();
+            return NotFound(new ResponseVM<UniversityVM>
+            {
+                Code = StatusCodes.Status404NotFound,
+                Status = HttpStatusCode.NotFound.ToString(),
+                Message = "ID University Tidak Ditemukan",
+            });
         }
         var data = _mapper.Map(university);
-        return Ok(data);
+        return Ok(new ResponseVM<UniversityVM>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "University By Id Berhasil Ditampilkan",
+            Data = data
+        });
     }
 
     [HttpPost]
@@ -86,10 +122,21 @@ public class UniversityController : ControllerBase
         var result = _universityRepository.Create(universityConverted);
         if (result is null)
         {
-            return BadRequest();
+            return BadRequest(new ResponseVM<UniversityVM>
+            {
+                Code = StatusCodes.Status400BadRequest,
+                Status = HttpStatusCode.BadRequest.ToString(),
+                Message = "Data University Tidak Berhasil Ditambahkan",
+            });
         }
 
-        return Ok(result);
+        return Ok(new ResponseVM<UniversityVM>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Data University Berhasil Ditambahkan",
+            Data = result
+        });
     }
 
     [HttpPut]
@@ -99,10 +146,43 @@ public class UniversityController : ControllerBase
         var isUpdated = _universityRepository.Update(universityConverted);
         if (!isUpdated)
         {
-            return BadRequest();
+            return BadRequest(new ResponseVM<UniversityVM>
+            {
+                Code = StatusCodes.Status400BadRequest,
+                Status = HttpStatusCode.BadRequest.ToString(),
+                Message = "Data University Tidak Berhasil Diperbarui",
+            });
         }
        
-        return Ok();
+        return Ok(new ResponseVM<UniversityVM>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Data University Berhasil Diperbarui",
+
+        });
+    }
+    [HttpGet("ByName/{name}")]
+    public IActionResult GetByName(string name)
+    {
+        var university = _universityRepository.GetByName(name);
+        if (!university.Any())
+        {
+            return NotFound(new ResponseVM<UniversityVM>
+            {
+                Code = StatusCodes.Status404NotFound,
+                Status = HttpStatusCode.NotFound.ToString(),
+                Message = "Nama University Tidak Ditemukan",
+            });
+        }
+        var data = university.Select(_mapper.Map);
+        return Ok(new ResponseVM<IEnumerable<UniversityVM>>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "University By Name Berhasil Ditampilkan",
+            Data = data
+        });
     }
 
     [HttpDelete("{guid}")]
@@ -111,9 +191,20 @@ public class UniversityController : ControllerBase
         var isDeleted = _universityRepository.Delete(guid);
         if (!isDeleted)
         {
-            return BadRequest();
+            return BadRequest(new ResponseVM<UniversityVM>
+            {
+                Code = StatusCodes.Status400BadRequest,
+                Status = HttpStatusCode.BadRequest.ToString(),
+                Message = "Data University Gagal Dihapus",
+            });
         }
-        return Ok();
+        return Ok(new ResponseVM<UniversityVM>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Data University Berhasil Dihapus",
+
+        });
     }
 }
 

@@ -9,6 +9,6 @@ public interface IRoomRepository : IGenericRepository<Room>
     //k1
     IEnumerable<MasterRoomVM> GetByDate(DateTime dateTime);
     IEnumerable<RoomUsedVM> GetCurrentlyUsedRooms();
-
+    
 }
 

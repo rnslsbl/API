@@ -3,8 +3,12 @@ using API.Models;
 using API.Repositories;
 using API.Utility;
 using API.ViewModels.Accounts;
+using API.ViewModels.Bookings;
+using API.ViewModels.Others;
+using API.ViewModels.Roles;
 using API.ViewModels.Rooms;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace API.Controllers;
 [ApiController]
@@ -28,11 +32,22 @@ public class RoomController : ControllerBase
         var rooms = _roomRepository.GetAll();
         if (!rooms.Any())
         {
-            return NotFound();
+            return NotFound(new ResponseVM<RoomVM>
+            {
+                Code = StatusCodes.Status404NotFound,
+                Status = HttpStatusCode.NotFound.ToString(),
+                Message = "Data Room Tidak Ditemukan",
+            });
         }
 
         var data = rooms.Select(_mapper.Map).ToList();
-        return Ok(data);
+        return Ok(new ResponseVM<List<RoomVM>>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Data Room Berhasil Ditampilkan",
+            Data = data
+        });
     }
 
     [HttpGet("{guid}")]
@@ -41,11 +56,22 @@ public class RoomController : ControllerBase
         var room = _roomRepository.GetByGuid(guid);
         if (room is null)
         {
-            return NotFound();
+            return NotFound(new ResponseVM<RoomVM>
+            {
+                Code = StatusCodes.Status404NotFound,
+                Status = HttpStatusCode.NotFound.ToString(),
+                Message = "ID Room Tidak Ditemukan",
+            });
         }
 
         var data = _mapper.Map(room);
-        return Ok(data);
+        return Ok(new ResponseVM<RoomVM>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Room By Id Berhasil Ditampilkan",
+            Data = data
+        });
     }
 
     [HttpPost]
@@ -55,10 +81,21 @@ public class RoomController : ControllerBase
         var result = _roomRepository.Create(roomConverted);
         if (result is null)
         {
-            return BadRequest();
+            return BadRequest(new ResponseVM<RoomVM>
+            {
+                Code = StatusCodes.Status400BadRequest,
+                Status = HttpStatusCode.BadRequest.ToString(),
+                Message = "Data Room Tidak Berhasil Ditambahkan",
+            });
         }
 
-        return Ok(result);
+        return Ok(new ResponseVM<Room>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Data Room Berhasil Ditambahkan",
+            Data = result
+        });
     }
 
     [HttpPut]
@@ -68,10 +105,21 @@ public class RoomController : ControllerBase
         var isUpdated = _roomRepository.Update(roomConverted);
         if (!isUpdated)
         {
-            return BadRequest();
+            return BadRequest(new ResponseVM<RoomVM>
+            {
+                Code = StatusCodes.Status400BadRequest,
+                Status = HttpStatusCode.BadRequest.ToString(),
+                Message = "Data Room Tidak Berhasil Diperbarui",
+            });
         }
+    
+        return Ok(new ResponseVM<RoomVM>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Data Room Berhasil Diperbarui",
 
-        return Ok();
+        });
     }
 
     [HttpDelete("{guid}")]
@@ -80,10 +128,21 @@ public class RoomController : ControllerBase
         var isDeleted = _roomRepository.Delete(guid);
         if (!isDeleted)
         {
-            return BadRequest();
+            return BadRequest(new ResponseVM<RoomVM>
+            {
+                Code = StatusCodes.Status400BadRequest,
+                Status = HttpStatusCode.BadRequest.ToString(),
+                Message = "Data Room Gagal Dihapus",
+            });
         }
 
-        return Ok();
+        return Ok(new ResponseVM<RoomVM>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Data Room Berhasil Dihapus",
+
+        });
     }
 
     [HttpGet("AvailableRoom")]
@@ -94,14 +153,25 @@ public class RoomController : ControllerBase
             var room = _roomRepository.GetAvailableRoom();
             if (room is null)
             {
-                return NotFound();
+                return NotFound(new ResponseVM<RoomBookedTodayVM>
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Status = HttpStatusCode.NotFound.ToString(),
+                    Message = "Available Room Tidak Ditemukan",
+                });
             }
 
-            return Ok(room);
+            return Ok(new ResponseVM<List<RoomBookedTodayVM>>
+            {
+                Code = StatusCodes.Status200OK,
+                Status = HttpStatusCode.OK.ToString(),
+                Message = "Room By Id Berhasil Ditampilkan",
+                Data = room.ToList()
+            });
         }
         catch
         {
-            return Ok("Ada error");
+            return StatusCode(500, "Internal Server Error");
         }
     }
 
@@ -112,10 +182,21 @@ public class RoomController : ControllerBase
         var room = _roomRepository.GetCurrentlyUsedRooms();
         if (room is null)
         {
-            return NotFound();
+            return NotFound(new ResponseVM<RoomUsedVM>
+            {
+                Code = StatusCodes.Status404NotFound,
+                Status = HttpStatusCode.NotFound.ToString(),
+                Message = "Ruangan yang Sedang Digunakan Tidak Ditemukan",
+            });
         }
 
-        return Ok(room);
+        return Ok(new ResponseVM<List<RoomUsedVM>>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Ruangan yang Sedang Digunakan Berhasil Ditampilkan",
+            Data = room.ToList()
+        });
     }
 
     [HttpGet("CurrentlyUsedRoomsByDate")]
@@ -124,12 +205,22 @@ public class RoomController : ControllerBase
         var room = _roomRepository.GetByDate(dateTime);
         if (room is null)
         {
-            return NotFound();
+            return NotFound(new ResponseVM<RoomUsedVM>
+            {
+                Code = StatusCodes.Status404NotFound,
+                Status = HttpStatusCode.NotFound.ToString(),
+                Message = "Ruangan yang Sedang Digunakan Tidak Ditemukan",
+            });
         }
 
-        return Ok(room);
+        return Ok(new ResponseVM<IEnumerable<MasterRoomVM>>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Ruangan yang Sedang Digunakan Berhasil Ditampilkan",
+            Data = room
+        });
     }
-
     private string GetRoomStatus(Booking booking, DateTime dateTime)
     {
 

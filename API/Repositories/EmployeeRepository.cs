@@ -54,12 +54,11 @@ public class EmployeeRepository : GenericRepository<Employee>, IEmployeeReposito
         return employeeEducations;
     }
 
-
     MasterEmployeeVM? IEmployeeRepository.GetMasterEmployeeByGuid(Guid guid)
     {
         var employee = GetByGuid(guid);
-        var educations = _context.Educations.Find(guid);
-        var universities = _context.Universities.Find(educations.UniversityGuid);
+        var education = _context.Educations.FirstOrDefault(e => e.Guid == guid);
+        var university = _context.Universities.FirstOrDefault(u => u.Guid == education.UniversityGuid);
 
         var data = new MasterEmployeeVM
         {
@@ -71,14 +70,13 @@ public class EmployeeRepository : GenericRepository<Employee>, IEmployeeReposito
             HiringDate = employee.HiringDate,
             Email = employee.Email,
             PhoneNumber = employee.PhoneNumber,
-            Major = educations.Major,
-            Degree = educations.Degree,
-            GPA = educations.Gpa,
-            UniversityName = universities.Name
+            Major = education.Major,
+            Degree = education.Degree,
+            GPA = education.Gpa,
+            UniversityName = university.Name
         };
 
         return data;
-
     }
     //end k1
 
@@ -110,4 +108,23 @@ public class EmployeeRepository : GenericRepository<Employee>, IEmployeeReposito
     }
 
     //end k2
+
+    //k5
+    public Guid? FindGuidByEmail(string email)
+    {
+        try
+        {
+            var employee = _context.Employees.FirstOrDefault(e => e.Email == email);
+            if (employee == null)
+            {
+                return null;
+            }
+            return employee.Guid;
+        }
+        catch
+        {
+            return null;
+        }
+        //end k5
+    }
 }

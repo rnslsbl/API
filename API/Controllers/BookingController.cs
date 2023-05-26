@@ -7,7 +7,9 @@ using API.ViewModels.Educations;
 using API.ViewModels.Employees;
 using API.ViewModels.Rooms;
 using API.ViewModels.Universities;
+using API.ViewModels.Others;
 using System.Linq.Expressions;
+using System.Net;
 
 namespace API.Controllers
 {
@@ -36,12 +38,22 @@ namespace API.Controllers
             {
                 var bookingDetails = _bookingRepository.GetAllBookingDetail();
 
-                return Ok(bookingDetails);
+                return Ok(new ResponseVM<IEnumerable<BookingDetailVM>> {
+                    Code = StatusCodes.Status200OK,
+                    Status =HttpStatusCode.OK.ToString(),
+                    Message = "Detail Booking Berhasil Ditampilkan",
+                    Data = bookingDetails
+                });
 
             }
             catch
             {
-                return Ok("error");
+                return NotFound(new ResponseVM<BookingDetailVM>
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Status = HttpStatusCode.NotFound.ToString(),
+                    Message = "Detail Booking Tidak Ditemukan",
+                });
             }
              }
 
@@ -54,27 +66,74 @@ namespace API.Controllers
                 if (booking is null)
                 {
 
-                    return NotFound();
+                    return NotFound(new ResponseVM<BookingDetailVM>
+                    {
+                        Code = StatusCodes.Status404NotFound,
+                        Status = HttpStatusCode.NotFound.ToString(),
+                        Message = "ID Booking Tidak Ditemukan",
+                    });
                 }
 
-                return Ok(booking);
+                return Ok(new ResponseVM<BookingDetailVM>
+                {
+                    Code = StatusCodes.Status200OK,
+                    Status = HttpStatusCode.OK.ToString(),
+                    Message = "Detail Booking Berhasil Ditampilkan",
+                    Data = booking
+                });
             }
-            catch
+            catch (Exception ex)
             {
-                return Ok("error");
+                return StatusCode(500, "Internal Server Error");
             }
         }
 
-         [HttpGet]
+        //K3
+        [HttpGet("BookingLength")]
+        public IActionResult GetDuration()
+        {
+            var bookingLengths = _bookingRepository.GetBookingDuration();
+            if (!bookingLengths.Any())
+            {
+                return NotFound(new ResponseVM<BookingDurationVM>
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Status = HttpStatusCode.NotFound.ToString(),
+                    Message = "Data Booking Tidak Ditemukan",
+                });
+            }
+            return Ok(new ResponseVM<IEnumerable<BookingDurationVM>>
+            {
+                Code = StatusCodes.Status200OK,
+                Status = HttpStatusCode.OK.ToString(),
+                Message = "Durasi Booking Berhasil Ditampilkan",
+                Data = bookingLengths
+            });
+        }
+
+
+
+        [HttpGet]
         public IActionResult GetAll()
         {
             var bookings = _bookingRepository.GetAll();
             if (!bookings.Any())
             {
-                return NotFound();
+                return NotFound(new ResponseVM<BookingVM>
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Status = HttpStatusCode.NotFound.ToString(),
+                    Message = "Data Booking Tidak Ditemukan",
+                });
             }
             var bookingConverteds = bookings.Select(_mapper.Map).ToList();
-            return Ok(bookingConverteds);
+            return Ok(new ResponseVM<List<BookingVM>>
+            {
+                Code = StatusCodes.Status200OK,
+                Status = HttpStatusCode.OK.ToString(),
+                Message = "Data Booking Berhasil Ditampilkan",
+                Data = bookingConverteds
+            });
         }
 
         [HttpGet("{guid}")]
@@ -83,10 +142,21 @@ namespace API.Controllers
             var booking = _bookingRepository.GetByGuid(guid);
             if (booking is null)
             {
-                return NotFound();
+                return NotFound(new ResponseVM<BookingVM>
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Status = HttpStatusCode.NotFound.ToString(),
+                    Message = "ID Booking Tidak Ditemukan",
+                });
             }
             var bookingConverted = _mapper.Map(booking);
-            return Ok(bookingConverted);
+            return Ok(new ResponseVM<BookingVM>
+            {
+                Code = StatusCodes.Status200OK,
+                Status = HttpStatusCode.OK.ToString(),
+                Message = "Booking By Id Berhasil Ditampilkan",
+                Data = bookingConverted
+            });
         }
 
         [HttpPost]
@@ -96,9 +166,20 @@ namespace API.Controllers
             var result = _bookingRepository.Create(booking);
             if (result is null)
             {
-                return BadRequest();
+                return BadRequest(new ResponseVM<BookingVM>
+                {
+                    Code = StatusCodes.Status400BadRequest,
+                    Status = HttpStatusCode.BadRequest.ToString(),
+                    Message = "Data Booking Tidak Berhasil Ditambahkan",                    
+                });
             }
-            return Ok(result);
+            return Ok(new ResponseVM<Booking>
+            {
+                Code = StatusCodes.Status200OK,
+                Status = HttpStatusCode.OK.ToString(),
+                Message = "Data Booking Berhasil Ditambahkan",
+                Data = result
+            });
 
         }
         [HttpPut]
@@ -108,32 +189,44 @@ namespace API.Controllers
             var isUpdated = _bookingRepository.Update(booking);
             if (!isUpdated)
             {
-                return BadRequest();
+                return BadRequest(new ResponseVM<BookingVM>
+                {
+                    Code = StatusCodes.Status400BadRequest,
+                    Status = HttpStatusCode.BadRequest.ToString(),
+                    Message = "Data Booking Tidak Berhasil Diperbarui",
+                });
             }
-            return Ok();
+            return Ok(new ResponseVM<BookingVM>
+            {
+                Code = StatusCodes.Status200OK,
+                Status = HttpStatusCode.OK.ToString(),
+                Message = "Data Booking Berhasil Diperbarui",
+                
+            });
         }
+
         [HttpDelete]
         public IActionResult Delete(Guid guid)
         {
             var isDeleted = _bookingRepository.Delete(guid);
             if (!isDeleted)
             {
-                return BadRequest();
+                return BadRequest(new ResponseVM<BookingVM>
+                {
+                    Code = StatusCodes.Status400BadRequest,
+                    Status = HttpStatusCode.BadRequest.ToString(),
+                    Message = "Data Booking Gagal Dihapus",
+                });
             }
-            return Ok();
-        }
-
-        //K3
-        [HttpGet("bookinglength")]
-        public IActionResult GetDuration()
-        {
-            var bookingLengths = _bookingRepository.GetBookingDuration();
-            if (!bookingLengths.Any())
+            return Ok(new ResponseVM<BookingVM>
             {
-                return NotFound();
-            }
+                Code = StatusCodes.Status200OK,
+                Status = HttpStatusCode.OK.ToString(),
+                Message = "Data Booking Berhasil Dihapus",
 
-            return Ok(bookingLengths);
+            });
         }
+
+
     }
 }

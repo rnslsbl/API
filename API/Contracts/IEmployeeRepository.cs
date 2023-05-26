@@ -10,5 +10,8 @@ namespace API.Contracts;
 
     //k2
     int CreateWithValidate(Employee employee);
+
+    //k5
+    public Guid? FindGuidByEmail(string email);
 }
 

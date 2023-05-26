@@ -3,9 +3,12 @@ using API.Models;
 using API.Repositories;
 using API.Utility;
 using API.ViewModels.Accounts;
+using API.ViewModels.Employees;
+using API.ViewModels.Others;
 using API.ViewModels.Roles;
 using API.ViewModels.Rooms;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace API.Controllers;
 [ApiController]
@@ -29,11 +32,22 @@ public class RoleController : ControllerBase
         var roles = _roleRepository.GetAll();
         if (!roles.Any())
         {
-            return NotFound();
+            return NotFound(new ResponseVM<RoleVM>
+            {
+                Code = StatusCodes.Status404NotFound,
+                Status = HttpStatusCode.NotFound.ToString(),
+                Message = "Data Role Tidak Ditemukan",
+            });
         }
 
         var data = roles.Select(_mapper.Map).ToList();
-        return Ok(data);
+        return Ok(new ResponseVM<List<RoleVM>>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Data Role Berhasil Ditampilkan",
+            Data = data
+        });
     }
 
     [HttpGet("{guid}")]
@@ -42,10 +56,21 @@ public class RoleController : ControllerBase
         var role = _roleRepository.GetByGuid(guid);
         if (role is null)
         {
-            return NotFound();
+            return NotFound(new ResponseVM<RoleVM>
+            {
+                Code = StatusCodes.Status404NotFound,
+                Status = HttpStatusCode.NotFound.ToString(),
+                Message = "ID Role Tidak Ditemukan",
+            });
         }
         var data = _mapper.Map(role);
-        return Ok(data);
+        return Ok(new ResponseVM<RoleVM>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Role By Id Berhasil Ditampilkan",
+            Data = data
+        });
     }
 
     [HttpPost]
@@ -55,10 +80,21 @@ public class RoleController : ControllerBase
         var result = _roleRepository.Create(roleConverted);
         if (result is null)
         {
-            return BadRequest();
+            return BadRequest(new ResponseVM<RoleVM>
+            {
+                Code = StatusCodes.Status400BadRequest,
+                Status = HttpStatusCode.BadRequest.ToString(),
+                Message = "Data Role Tidak Berhasil Ditambahkan",
+            });
         }
-
-        return Ok(result);
+    
+        return Ok(new ResponseVM<Role>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Data Role Berhasil Ditambahkan",
+            Data = result
+        });
     }
 
     [HttpPut]
@@ -68,10 +104,21 @@ public class RoleController : ControllerBase
         var isUpdated = _roleRepository.Update(roleConverted);
         if (!isUpdated)
         {
-            return BadRequest();
+            return BadRequest(new ResponseVM<RoleVM>
+            {
+                Code = StatusCodes.Status400BadRequest,
+                Status = HttpStatusCode.BadRequest.ToString(),
+                Message = "Data Role Tidak Berhasil Diperbarui",
+            });
         }
 
-        return Ok();
+        return Ok(new ResponseVM<RoleVM>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Data Role Berhasil Diperbarui",
+
+        });
     }
 
     [HttpDelete("{guid}")]
@@ -80,10 +127,21 @@ public class RoleController : ControllerBase
         var isDeleted = _roleRepository.Delete(guid);
         if (!isDeleted)
         {
-            return BadRequest();
+            return BadRequest(new ResponseVM<RoleVM>
+            {
+                Code = StatusCodes.Status400BadRequest,
+                Status = HttpStatusCode.BadRequest.ToString(),
+                Message = "Data Role Gagal Dihapus",
+            });
         }
 
-        return Ok();
+        return Ok(new ResponseVM<RoleVM>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Data Role Berhasil Dihapus",
+
+        });
     }
 }
 

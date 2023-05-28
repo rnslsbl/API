@@ -1,9 +1,12 @@
 ﻿using API.Contexts;
 using API.Contracts;
 using API.Models;
+using API.Utility;
 using API.ViewModels.Accounts;
 using API.ViewModels.Login;
 using Microsoft.EntityFrameworkCore;
+using BCrypt.Net;
+using Azure.Core;
 
 namespace API.Repositories;
 
@@ -18,6 +21,7 @@ public class AccountRepository : GenericRepository<Account>, IAccountRepository
         _universityRepository = universityRepository;
         _employeeRepository = employeeRepository;
         _educationRepository = educationRepository;
+
     }
 
 
@@ -27,7 +31,10 @@ public class AccountRepository : GenericRepository<Account>, IAccountRepository
     private readonly IEducationRepository _educationRepository;
 
 
+
     // coba
+   
+
 
     public int Register(RegisterVM registerVM)
     {
@@ -40,6 +47,8 @@ public class AccountRepository : GenericRepository<Account>, IAccountRepository
 
             };
             _universityRepository.CreateWithValidate(university);
+            
+
 
             var employee = new Employee
             {
@@ -69,10 +78,11 @@ public class AccountRepository : GenericRepository<Account>, IAccountRepository
             };
             _educationRepository.Create(education);
 
+            var hashPassword = Hashing.HashPassword(registerVM.Password);
             var account = new Account
             {
                 Guid = employee.Guid,
-                Password = registerVM.Password,
+                Password = hashPassword,        
                 IsDeleted = false,
                 IsUsed = true,
                 OTP = 0

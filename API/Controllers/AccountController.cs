@@ -18,7 +18,7 @@ using API.ViewModels.Bookings;
 namespace API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
-public class AccountController : ControllerBase
+public class AccountController : BaseController<Account, AccountVM>
 {
 
     private readonly IAccountRepository _accountRepository;
@@ -26,14 +26,16 @@ public class AccountController : ControllerBase
     private readonly IEmployeeRepository _employeeRepository; //k3 & k6
     private readonly IMapper<Account, ChangePasswordVM> _changePasswordMapper; //k6
     private readonly IMapper<Employee, EmployeeVM> _emailMapper; //k6
+    private readonly IEmailService _emailService;
 
-    public AccountController(IAccountRepository accountRepository, IMapper<Account, AccountVM> mapper, IEmployeeRepository employeeRepository, IMapper<Account, ChangePasswordVM> changePasswordMapper, IMapper<Employee, EmployeeVM> emailMapper)
+    public AccountController(IAccountRepository accountRepository, IMapper<Account, AccountVM> mapper, IEmployeeRepository employeeRepository, IMapper<Account, ChangePasswordVM> changePasswordMapper, IMapper<Employee, EmployeeVM> emailMapper, IEmailService emailService) : base (accountRepository, mapper)
     {
         _accountRepository = accountRepository;
         _mapper = mapper;
         _employeeRepository = employeeRepository;
         _changePasswordMapper = changePasswordMapper;
         _emailMapper = emailMapper;
+        _emailService = emailService;
     }
 
     //k2
@@ -99,7 +101,8 @@ public class AccountController : ControllerBase
                 Message = "Data Akun Tidak Ditemukan",
             });
         }
-            if (account.Password != loginVM.Password)
+        var validatePassword = Hashing.ValidatePassword(loginVM.Password, account.Password);
+            if (validatePassword is false)
         {
             return BadRequest(new ResponseVM<LoginVM>
             {
@@ -154,12 +157,11 @@ public class AccountController : ControllerBase
                     OTP = isUpdated
                 };
 
-                MailService mailService = new MailService();
-                mailService.WithSubject("Kode OTP")
-                           .WithBody("OTP anda adalah: " + isUpdated.ToString() + ".\n" +
-                                     "Mohon kode OTP anda tidak diberikan kepada pihak lain" + ".\n" + "Terima kasih.")
-                           .WithEmail(email)
-                           .Send();
+                _emailService.SetEmail(email)
+                        .SetSubject("Forget Password")
+                        .SetHtmlMessage($"Your OTP is {isUpdated}")
+                        .SendEmailAsync();
+                
 
                 return Ok(new ResponseVM<AccountResetPasswordVM>
                 {
@@ -226,121 +228,6 @@ public class AccountController : ControllerBase
         }
         //end k6
 
-        [HttpGet]
-        public IActionResult GetAll()
-        {
-            var accounts = _accountRepository.GetAll();
-            if (!accounts.Any())
-            {
-                return NotFound(new ResponseVM<AccountVM>
-                {
-                    Code = StatusCodes.Status404NotFound,
-                    Status = HttpStatusCode.NotFound.ToString(),
-                    Message = "Data Akun Tidak Ditemukan",
-                });
-            }
-            var data = accounts.Select(_mapper.Map).ToList();
-            return Ok(new ResponseVM<List<AccountVM>>
-            {
-                Code = StatusCodes.Status200OK,
-                Status = HttpStatusCode.OK.ToString(),
-                Message = "Data Akun Berhasil Ditampilkan",
-                Data = data
-            });
-        }
-
-        [HttpGet("{guid}")]
-        public IActionResult GetByGuid(Guid guid)
-        {
-            var account = _accountRepository.GetByGuid(guid);
-            if (account is null)
-            {
-                return NotFound(new ResponseVM<List<AccountVM>>
-                {
-                    Code = StatusCodes.Status404NotFound,
-                    Status = HttpStatusCode.NotFound.ToString(),
-                    Message = "ID Account Tidak Ditemukan",
-                });
-            }
-            var data = _mapper.Map(account);
-            return Ok(new ResponseVM<AccountVM>
-            {
-                Code = StatusCodes.Status200OK,
-                Status = HttpStatusCode.OK.ToString(),
-                Message = "Data Akun Berhasil Ditampilkan",
-                Data = data
-            });
-        }
-    
-
-    [HttpPost]
-    public IActionResult Create(AccountVM accountVM)
-    {
-        var accountConverted = _mapper.Map(accountVM);
-        var result = _accountRepository.Create(accountConverted);
-        if (result is null)
-        {
-            return BadRequest(new ResponseVM<AccountVM>
-            {
-                Code = StatusCodes.Status400BadRequest,
-                Status = HttpStatusCode.BadRequest.ToString(),
-                Message = "Akun Baru Tidak Berhasil Ditambahkan",
-            });
-        }
-
-        return Ok(new ResponseVM<Account>
-        {
-            Code = StatusCodes.Status200OK,
-            Status = HttpStatusCode.OK.ToString(),
-            Message = "Akun Baru Berhasil Ditambahkan",
-            Data = result
-        });
-    }
-    [HttpPut]
-    public IActionResult Update(AccountVM accountVM)
-    {
-        var accountConverted = _mapper.Map(accountVM);
-        var isUpdated = _accountRepository.Update(accountConverted);
-        if (!isUpdated)
-        {
-            return BadRequest(new ResponseVM<AccountVM>
-            {
-                Code = StatusCodes.Status400BadRequest,
-                Status = HttpStatusCode.BadRequest.ToString(),
-                Message = "Akun Tidak Berhasil Diperbarui",
-            });
-        }
-
-        return Ok(new ResponseVM<AccountVM>
-        {
-            Code = StatusCodes.Status200OK,
-            Status = HttpStatusCode.OK.ToString(),
-            Message = "Akun Berhasil Diperbarui",
-
-        });
-    }
-
-        [HttpDelete("{guid}")]
-    public IActionResult Delete(Guid guid)
-    {
-        var isDeleted = _accountRepository.Delete(guid);
-        if (!isDeleted)
-        {
-            return BadRequest(new ResponseVM<AccountVM>
-            {
-                Code = StatusCodes.Status400BadRequest,
-                Status = HttpStatusCode.BadRequest.ToString(),
-                Message = "Akun Gagal Dihapus",
-            });
-        }
-
-        return Ok(new ResponseVM<AccountVM>
-        {
-            Code = StatusCodes.Status200OK,
-            Status = HttpStatusCode.OK.ToString(),
-            Message = "Akun Berhasil Dihapus",
-
-        });
-    }
+      
 }
 

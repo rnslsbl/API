@@ -2,6 +2,7 @@
 using API.Models;
 using API.Repositories;
 using API.Utility;
+using API.ViewModels.Accounts;
 using API.ViewModels.Educations;
 using API.ViewModels.Others;
 using API.ViewModels.Rooms;
@@ -12,15 +13,15 @@ using System.Net;
 namespace API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
-public class UniversityController : ControllerBase
-    {
+public class UniversityController : BaseController<University, UniversityVM>
+{
 
     private readonly IUniversityRepository _universityRepository;
     private readonly IEducationRepository _educationRepository;
     private readonly IMapper<University, UniversityVM> _mapper;
     private readonly IMapper<Education, EducationVM> _educationMapper;
 
-    public UniversityController(IUniversityRepository universityRepository, IEducationRepository educationRepository, IMapper<University, UniversityVM> mapper, IMapper<Education, EducationVM> educationMapper )
+    public UniversityController(IUniversityRepository universityRepository, IEducationRepository educationRepository, IMapper<University, UniversityVM> mapper, IMapper<Education, EducationVM> educationMapper ) : base (universityRepository, mapper)
     {
         _universityRepository = universityRepository;
         _educationRepository = educationRepository;
@@ -69,99 +70,6 @@ public class UniversityController : ControllerBase
         });
     }
 
-    [HttpGet]
-    public IActionResult GetAll()
-    {
-        var universities = _universityRepository.GetAll();
-        if (!universities.Any())
-        {
-            return NotFound(new ResponseVM<UniversityVM>
-            {
-                Code = StatusCodes.Status404NotFound,
-                Status = HttpStatusCode.NotFound.ToString(),
-                Message = "Data University Tidak Ditemukan",
-            });
-        }
-        var data = universities.Select(_mapper.Map).ToList();
-        return Ok(new ResponseVM<List<UniversityVM>>
-        {
-            Code = StatusCodes.Status200OK,
-            Status = HttpStatusCode.OK.ToString(),
-            Message = "Data University Berhasil Ditampilkan",
-            Data = data
-        });
-    }
-
-    [HttpGet("{guid}")]
-    public IActionResult GetByGuid(Guid guid)
-    {
-        var university = _universityRepository.GetByGuid(guid);
-        if (university is null)
-        {
-            return NotFound(new ResponseVM<UniversityVM>
-            {
-                Code = StatusCodes.Status404NotFound,
-                Status = HttpStatusCode.NotFound.ToString(),
-                Message = "ID University Tidak Ditemukan",
-            });
-        }
-        var data = _mapper.Map(university);
-        return Ok(new ResponseVM<UniversityVM>
-        {
-            Code = StatusCodes.Status200OK,
-            Status = HttpStatusCode.OK.ToString(),
-            Message = "University By Id Berhasil Ditampilkan",
-            Data = data
-        });
-    }
-
-    [HttpPost]
-    public IActionResult Create(UniversityVM universityVM)
-    {
-        var universityConverted = _mapper.Map(universityVM);
-        var result = _universityRepository.Create(universityConverted);
-        if (result is null)
-        {
-            return BadRequest(new ResponseVM<UniversityVM>
-            {
-                Code = StatusCodes.Status400BadRequest,
-                Status = HttpStatusCode.BadRequest.ToString(),
-                Message = "Data University Tidak Berhasil Ditambahkan",
-            });
-        }
-
-        return Ok(new ResponseVM<UniversityVM>
-        {
-            Code = StatusCodes.Status200OK,
-            Status = HttpStatusCode.OK.ToString(),
-            Message = "Data University Berhasil Ditambahkan",
-            Data = result
-        });
-    }
-
-    [HttpPut]
-    public IActionResult Update(UniversityVM universityVM)
-    {
-        var universityConverted = _mapper.Map(universityVM);
-        var isUpdated = _universityRepository.Update(universityConverted);
-        if (!isUpdated)
-        {
-            return BadRequest(new ResponseVM<UniversityVM>
-            {
-                Code = StatusCodes.Status400BadRequest,
-                Status = HttpStatusCode.BadRequest.ToString(),
-                Message = "Data University Tidak Berhasil Diperbarui",
-            });
-        }
-       
-        return Ok(new ResponseVM<UniversityVM>
-        {
-            Code = StatusCodes.Status200OK,
-            Status = HttpStatusCode.OK.ToString(),
-            Message = "Data University Berhasil Diperbarui",
-
-        });
-    }
     [HttpGet("ByName/{name}")]
     public IActionResult GetByName(string name)
     {
@@ -185,26 +93,6 @@ public class UniversityController : ControllerBase
         });
     }
 
-    [HttpDelete("{guid}")]
-    public IActionResult Delete(Guid guid)
-    {
-        var isDeleted = _universityRepository.Delete(guid);
-        if (!isDeleted)
-        {
-            return BadRequest(new ResponseVM<UniversityVM>
-            {
-                Code = StatusCodes.Status400BadRequest,
-                Status = HttpStatusCode.BadRequest.ToString(),
-                Message = "Data University Gagal Dihapus",
-            });
-        }
-        return Ok(new ResponseVM<UniversityVM>
-        {
-            Code = StatusCodes.Status200OK,
-            Status = HttpStatusCode.OK.ToString(),
-            Message = "Data University Berhasil Dihapus",
-
-        });
-    }
+    
 }
 

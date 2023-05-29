@@ -14,7 +14,8 @@ public class AccountRepository : GenericRepository<Account>, IAccountRepository
 {
     
     //k2
-    public AccountRepository(BookingManagementDbContext context, IUniversityRepository universityRepository,
+    public AccountRepository(BookingManagementDbContext context, 
+        IUniversityRepository universityRepository,
         IEmployeeRepository employeeRepository,
         IEducationRepository educationRepository) : base(context)
     {
@@ -23,8 +24,6 @@ public class AccountRepository : GenericRepository<Account>, IAccountRepository
         _educationRepository = educationRepository;
 
     }
-
-
     //k2
     private readonly IUniversityRepository _universityRepository;
     private readonly IEmployeeRepository _employeeRepository;
@@ -73,16 +72,18 @@ public class AccountRepository : GenericRepository<Account>, IAccountRepository
                 Guid = employee.Guid,
                 Major = registerVM.Major,
                 Degree = registerVM.Degree,
-                Gpa = registerVM.GPA,
+                Gpa = registerVM.Gpa,
                 UniversityGuid = university.Guid
             };
             _educationRepository.Create(education);
 
-            var hashPassword = Hashing.HashPassword(registerVM.Password);
+            /*var hashPassword = Hashing.HashPassword(registerVM.Password);*/
+
+
             var account = new Account
             {
                 Guid = employee.Guid,
-                Password = hashPassword,        
+                Password = Hashing.HashPassword(registerVM.Password),        
                 IsDeleted = false,
                 IsUsed = true,
                 OTP = 0
@@ -196,7 +197,7 @@ public class AccountRepository : GenericRepository<Account>, IAccountRepository
             return 5;
         }
         // Update password
-        account.Password = changePasswordVM.NewPassword;
+        account.Password = Hashing.HashPassword(changePasswordVM.NewPassword);
         account.IsUsed = true;
         try
         {

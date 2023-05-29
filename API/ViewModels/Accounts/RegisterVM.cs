@@ -20,7 +20,7 @@ namespace API.ViewModels.Accounts;
 
     public string Degree { get; set; }
 
-    public float GPA { get; set; }
+    public float Gpa { get; set; }
 
     //public Guid UniversityGuid { get; set; }
 

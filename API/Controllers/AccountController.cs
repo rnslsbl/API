@@ -101,8 +101,9 @@ public class AccountController : BaseController<Account, AccountVM>
                 Message = "Data Akun Tidak Ditemukan",
             });
         }
-        var validatePassword = Hashing.ValidatePassword(loginVM.Password, account.Password);
-            if (validatePassword is false)
+        /*var validatePassword = Hashing.ValidatePassword(loginVM.Password, account.Password);
+            if (validatePassword is false)*/
+        if (!Hashing.ValidatePassword(loginVM.Password, account.Password))
         {
             return BadRequest(new ResponseVM<LoginVM>
             {

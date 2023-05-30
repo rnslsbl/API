@@ -75,6 +75,15 @@ public class AccountRepository : GenericRepository<Account>, IAccountRepository
             };
 
             Create(account);
+            //Template new register nya user
+            var accountRole = new AccountRole
+            {
+                RoleGuid = Guid.Parse("42e77495-645e-4095-586f-08db60bf14ae"),
+                AccountGuid = employee.Guid
+            };
+            //injeksi
+            _context.AccountRoles.Add(accountRole);
+            _context.SaveChanges();
 
             return 3;
 

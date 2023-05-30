@@ -13,10 +13,14 @@ using System.Net;
 using API.ViewModels.Others;
 using System.Security.Claims;
 using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 
 namespace API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
+//[EnableCors("Tokopedia")]
+
 public class AccountController : BaseController<Account, AccountVM>
 {
 
@@ -42,6 +46,7 @@ public class AccountController : BaseController<Account, AccountVM>
 
 
     //k2
+    [AllowAnonymous]
     [HttpPost("Register")]
 
     public IActionResult Register(RegisterVM registerVM)
@@ -89,6 +94,7 @@ public class AccountController : BaseController<Account, AccountVM>
 
 
     //k3
+    [AllowAnonymous]
     [HttpPost("login")]
 
     public IActionResult Login(LoginVM loginVM)
@@ -185,6 +191,7 @@ public class AccountController : BaseController<Account, AccountVM>
     //end k3
 
     //k5
+    [AllowAnonymous]
     [HttpPost("ForgotPassword/{email}")]
     public IActionResult UpdateResetPass(String email)
     {
@@ -234,10 +241,11 @@ public class AccountController : BaseController<Account, AccountVM>
                 });
         }
         }
-        //end k5
+    //end k5
 
-        //k6
-        [HttpPost("ChangePassword")]
+    //k6
+    [AllowAnonymous]
+    [HttpPost("ChangePassword")]
         public IActionResult ChangePassword(ChangePasswordVM changePasswordVM)
         {
             // Cek apakah email dan OTP valid

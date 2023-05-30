@@ -14,7 +14,7 @@ using System.Net;
 namespace API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+
 
 public class UniversityController : BaseController<University, UniversityVM>
 {

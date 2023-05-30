@@ -11,6 +11,7 @@ using API.ViewModels.Others;
 using System.Linq.Expressions;
 using System.Net;
 using API.ViewModels.AccountRoles;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
@@ -31,7 +32,7 @@ namespace API.Controllers
             _employeeRepository = employeeRepository;
             _roomRepository = roomRepository;
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpGet("BookingDetail")]
         public IActionResult GetAllBookingDetail()
         {

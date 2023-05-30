@@ -7,13 +7,12 @@ using API.ViewModels.Employees;
 using API.ViewModels.Login;
 using API.ViewModels.Universities;
 using Microsoft.AspNetCore.Mvc;
-using API.ViewModels.Roles;
-using API.ViewModels.Rooms;
 using Microsoft.Identity.Client;
 using System.Net.Mail;
 using System.Net;
 using API.ViewModels.Others;
-using API.ViewModels.Bookings;
+using System.Security.Claims;
+using System.Runtime.CompilerServices;
 
 namespace API.Controllers;
 [ApiController]
@@ -27,8 +26,9 @@ public class AccountController : BaseController<Account, AccountVM>
     private readonly IMapper<Account, ChangePasswordVM> _changePasswordMapper; //k6
     private readonly IMapper<Employee, EmployeeVM> _emailMapper; //k6
     private readonly IEmailService _emailService;
+    private readonly ITokenService _tokenService;
 
-    public AccountController(IAccountRepository accountRepository, IMapper<Account, AccountVM> mapper, IEmployeeRepository employeeRepository, IMapper<Account, ChangePasswordVM> changePasswordMapper, IMapper<Employee, EmployeeVM> emailMapper, IEmailService emailService) : base (accountRepository, mapper)
+    public AccountController(IAccountRepository accountRepository, IMapper<Account, AccountVM> mapper, IEmployeeRepository employeeRepository, IMapper<Account, ChangePasswordVM> changePasswordMapper, IMapper<Employee, EmployeeVM> emailMapper, IEmailService emailService, ITokenService tokenService) : base(accountRepository, mapper)
     {
         _accountRepository = accountRepository;
         _mapper = mapper;
@@ -36,7 +36,10 @@ public class AccountController : BaseController<Account, AccountVM>
         _changePasswordMapper = changePasswordMapper;
         _emailMapper = emailMapper;
         _emailService = emailService;
+        _tokenService = tokenService;
     }
+
+
 
     //k2
     [HttpPost("Register")]
@@ -74,7 +77,7 @@ public class AccountController : BaseController<Account, AccountVM>
                     Code = StatusCodes.Status200OK,
                     Status = HttpStatusCode.OK.ToString(),
                     Message = "Proses Register Berhasil",
-                    
+
                 });
         }
 
@@ -91,6 +94,17 @@ public class AccountController : BaseController<Account, AccountVM>
     public IActionResult Login(LoginVM loginVM)
     {
         var account = _accountRepository.Login(loginVM);
+        var employee = _employeeRepository.GetByEmail(loginVM.Email);
+        if (employee == null)
+        {
+            return NotFound(new ResponseVM<LoginVM>
+            {
+                Code = StatusCodes.Status404NotFound,
+                Status = HttpStatusCode.NotFound.ToString(),
+                Message = "Data Akun Tidak Ditemukan",
+            });
+        }
+
 
         if (account == null)
         {
@@ -101,8 +115,15 @@ public class AccountController : BaseController<Account, AccountVM>
                 Message = "Data Akun Tidak Ditemukan",
             });
         }
+
+
+        //add range ada beberapa data
+        //login berhasil, email dan password sama baru bikin token.
+
+
         /*var validatePassword = Hashing.ValidatePassword(loginVM.Password, account.Password);
             if (validatePassword is false)*/
+
         if (!Hashing.ValidatePassword(loginVM.Password, account.Password))
         {
             return BadRequest(new ResponseVM<LoginVM>
@@ -113,19 +134,58 @@ public class AccountController : BaseController<Account, AccountVM>
             });
         }
 
-        return Ok(new ResponseVM<LoginVM>
+        var claims = new List<Claim>
+        {
+            new (ClaimTypes.NameIdentifier, employee.NIK),
+            new (ClaimTypes.Name, $"{employee.FirstName }, {employee.LastName}"),
+            new (ClaimTypes.Email, employee.Email),
+
+        };
+        var roles = _accountRepository.GetRoles(employee.Guid);
+
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
+        var token = _tokenService.GenerateToken(claims);
+
+        return Ok(new ResponseVM<string>
         {
             Code = StatusCodes.Status200OK,
             Status = HttpStatusCode.OK.ToString(),
             Message = "Berhasil Login",
-            
+            Data = token
+
         });
 
+    }
+
+    //[HttpGet("GetClaims/{token}")]
+    [HttpGet("token")]
+    public IActionResult GetToken(string token)
+    {
+        var claims = _tokenService.ExtractClaimsFromJwt(token);
+        if (claims is null)
+        {
+            return NotFound(new ResponseVM<ClaimVM>
+            {
+                Code = StatusCodes.Status404NotFound,
+                Status = HttpStatusCode.NotFound.ToString(),
+                Message = "Token is invalid or expired"
+            });
+        }
+        return Ok(new ResponseVM<ClaimVM>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Claims Has Been Retrieved",
+            Data = claims
+        });
     }
     //end k3
 
     //k5
-    [HttpPost("ForgotPassword" + "{email}")]
+    [HttpPost("ForgotPassword/{email}")]
     public IActionResult UpdateResetPass(String email)
     {
 
@@ -152,11 +212,11 @@ public class AccountController : BaseController<Account, AccountVM>
                     Message = "Failed Update OTP"
                 });
             default:
-                var hasil = new AccountResetPasswordVM
+                /*var hasil = new AccountResetPasswordVM
                 {
                     Email = email,
                     OTP = isUpdated
-                };
+                };*/
 
                 _emailService.SetEmail(email)
                         .SetSubject("Forget Password")
@@ -168,8 +228,8 @@ public class AccountController : BaseController<Account, AccountVM>
                 {
                     Code = StatusCodes.Status200OK,
                     Status = HttpStatusCode.OK.ToString(),
-                    Message = "Reset Password Berhasil",
-                    Data = hasil
+                    Message = "OTP Succesfully Sent to Email",
+                    
 
                 });
         }
@@ -222,13 +282,16 @@ public class AccountController : BaseController<Account, AccountVM>
                         Status = HttpStatusCode.BadRequest.ToString(),
                         Message = "Cek..",
                     });
-
+        
             }
             return null;
 
         }
-        //end k6
+    //end k6
 
-      
-}
+    
+    }
+
+
+
 

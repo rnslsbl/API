@@ -14,5 +14,9 @@ namespace API.Contracts;
     int UpdateOTP(Guid? employeeId);
     //k6
     public int ChangePasswordAccount(Guid? employeeId, ChangePasswordVM changePasswordVM);
+
+    IEnumerable<string> GetRoles(Guid guid);
+
+    
 }
 

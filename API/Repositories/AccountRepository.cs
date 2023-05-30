@@ -7,6 +7,7 @@ using API.ViewModels.Login;
 using Microsoft.EntityFrameworkCore;
 using BCrypt.Net;
 using Azure.Core;
+using API.ViewModels.Bookings;
 
 namespace API.Repositories;
 
@@ -29,26 +30,17 @@ public class AccountRepository : GenericRepository<Account>, IAccountRepository
     private readonly IEmployeeRepository _employeeRepository;
     private readonly IEducationRepository _educationRepository;
 
-
-
-    // coba
-   
-
-
     public int Register(RegisterVM registerVM)
     {
         try
         {
             var university = new University
             {
-                Code = registerVM.Code,
-                Name = registerVM.Name
+                Code = registerVM.UniversityCode,
+                Name = registerVM.UniversityName
 
             };
             _universityRepository.CreateWithValidate(university);
-            
-
-
             var employee = new Employee
             {
                 NIK = GenerateNIK(),
@@ -60,12 +52,7 @@ public class AccountRepository : GenericRepository<Account>, IAccountRepository
                 Email = registerVM.Email,
                 PhoneNumber = registerVM.PhoneNumber,
             };
-            var result = _employeeRepository.CreateWithValidate(employee);
-
-            if (result != 3)
-            {
-                return result;
-            }
+            var result = _employeeRepository.Create(employee);
 
             var education = new Education
             {
@@ -78,8 +65,6 @@ public class AccountRepository : GenericRepository<Account>, IAccountRepository
             _educationRepository.Create(education);
 
             /*var hashPassword = Hashing.HashPassword(registerVM.Password);*/
-
-
             var account = new Account
             {
                 Guid = employee.Guid,
@@ -214,7 +199,29 @@ public class AccountRepository : GenericRepository<Account>, IAccountRepository
         }
     }
 
-    //end k6
+    public IEnumerable<string> GetRoles(Guid guid)
+    {
+        //join account role dan role
+        var getAccount = GetByGuid(guid);
+        if (getAccount == null) return Enumerable.Empty<string>();
+        var getAccountRoles = from accountRoles in _context.AccountRoles
+                              join roles in _context.Roles on accountRoles.RoleGuid equals roles.Guid
+                               where accountRoles.AccountGuid == guid
+                              select roles.Name;
+
+        return getAccountRoles.ToList();
+
+        
 
 }
+
+
+
+
+    }
+
+    //end k6
+
+
+
 

@@ -9,10 +9,13 @@ public class EmployeeRepository : GenericRepository<Employee>, IEmployeeReposito
     //private readonly BookingManagementDbContext _context;
     public EmployeeRepository(BookingManagementDbContext context) : base(context) { }
 
-    public IEnumerable<Employee> GetByEmail(string email)
+    public Employee GetByEmail(string email)
     {
-        return _context.Set<Employee>().Where(e => e.Email == email);
+        return _context.Set<Employee>().FirstOrDefault(e => e.Email == email);
+        
+        
     }
+    
 
 
     // K1
@@ -127,4 +130,14 @@ public class EmployeeRepository : GenericRepository<Employee>, IEmployeeReposito
         }
         //end k5
     }
-}
+
+    public bool CheckEmailAndPhoneAndNIK(string value)
+    {
+
+        return _context.Employees
+            .Any(e => e.Email == value || e.PhoneNumber == value || e.NIK == value);
+            }
+       
+    }
+
+

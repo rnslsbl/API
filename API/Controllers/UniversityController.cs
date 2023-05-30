@@ -7,12 +7,15 @@ using API.ViewModels.Educations;
 using API.ViewModels.Others;
 using API.ViewModels.Rooms;
 using API.ViewModels.Universities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 namespace API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
+
 public class UniversityController : BaseController<University, UniversityVM>
 {
 

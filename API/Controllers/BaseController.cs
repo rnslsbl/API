@@ -1,6 +1,7 @@
 ﻿using API.Contracts;
 using API.Models;
 using API.ViewModels.Others;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult GetAll()
         {
             var models = _repository.GetAll();

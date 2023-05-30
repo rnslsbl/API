@@ -1,4 +1,5 @@
 ﻿using API.Utility;
+using System.ComponentModel.DataAnnotations;
 
 namespace API.ViewModels.Employees;
     public class MasterEmployeeVM
@@ -14,9 +15,9 @@ namespace API.ViewModels.Employees;
     public GenderLevel Gender { get; set; }
 
     public DateTime HiringDate { get; set; }
-
+    [EmailAddress]
     public string Email { get; set; }
-
+    [Phone] //anotasi
     public string PhoneNumber { get; set; }
     public string Major { get; set; }
     public string Degree { get; set; }

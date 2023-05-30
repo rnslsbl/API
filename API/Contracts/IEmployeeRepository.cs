@@ -13,5 +13,8 @@ namespace API.Contracts;
 
     //k5
     public Guid? FindGuidByEmail(string email);
+
+    public bool CheckEmailAndPhoneAndNIK(string value);
+    Employee GetByEmail(string email);
 }
 

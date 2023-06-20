@@ -82,7 +82,6 @@ public class AccountController : BaseController<Account, AccountVM>
                     Code = StatusCodes.Status200OK,
                     Status = HttpStatusCode.OK.ToString(),
                     Message = "Proses Register Berhasil",
-
                 });
         }
 

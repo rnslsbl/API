@@ -1,0 +1,74 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>403 - Forbidden</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,700" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="css/403.css" />
+    <link rel="stylesheet" href="~/css/403.css" asp-append-version="true">
+
+</head>
+
+<body>
+
+    <a href="https://codepen.io/uiswarup/full/yLzypyY" target="_blank">
+        <header class="top-header">
+        </header>
+
+        <!--dust particel-->
+        <div>
+            <div class="starsec"></div>
+            <div class="starthird"></div>
+            <div class="starfourth"></div>
+            <div class="starfifth"></div>
+        </div>
+        <!--Dust particle end--->
+
+
+        <div class="lamp__wrap">
+            <div class="lamp">
+                <div class="cable"></div>
+                <div class="cover"></div>
+                <div class="in-cover">
+                    <div class="bulb"></div>
+                </div>
+                <div class="light"></div>
+            </div>
+        </div>
+        <!-- END Lamp -->
+        <section class="error">
+            <!-- Content -->
+            <div class="error__content">
+                <div class="error__message message">
+                    <h1 class="message__title"> 403</h1>
+                    <h2 class="message__title">FORBIDDEN</h2>
+                    <p class="message__text">We're sorry, you don't have access for this menu.</p>
+                </div>
+
+            </div>
+            <!-- END Content -->
+
+        </section>
+
+    </a>
+
+</body>
+
+<script>
+    let timer = 5
+    setInterval(() => {
+        document.getElementById('countdown').innerHTML = timer;
+        timer--;
+
+        if (timer === 0) {
+            location.href = "/Account/Loginn";
+        }
+    }, 1000)
+</script>
+</html>

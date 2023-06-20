@@ -1,0 +1,43 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>401 - Unauthorized</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,700" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="css/401.css" />
+    <link rel="stylesheet" href="~/css/401.css" asp-append-version="true">
+
+</head>
+
+<body>
+
+        <code>
+            {--<span>:+401 Unauthorized+:</span>--}
+        </code>
+
+
+
+</body>
+
+@*
+    <script src="~/lib/jquery/dist/jquery.min.js" ></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/401.js" asp-append-version="true"></script>*@
+<script>
+    let timer = 20
+    setInterval(() => {
+        document.getElementById('countdown').innerHTML = timer;
+        timer--;
+
+        if (timer === 0) {
+            location.href = "/";
+        }
+    }, 1000)
+</script>
+</html>

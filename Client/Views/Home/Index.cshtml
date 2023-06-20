@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Home";
+    Layout = "_Layout";
+    var jwToken = ViewData["JWToken"];
+}
+<style>
+    .center-container {
+        display: flex;
+        height: 100vh; /* Optional: Set the container height to fill the viewport */
+    }
+
+    .large-textbox {
+        width: 100%; /* Adjust the width as needed */
+        height: 150px; /* Adjust the height as needed */
+    }
+</style>
+<div class="text-center">
+    <h1 class="jwt-text">Halo Selamat Datang</h1><br/>
+@*    <textarea id="jwtToken" readonly class="large-textbox">@jwToken</textarea>*@
+     @*<h2><a href="/Logout"> Logout Here </a></h2>*@
+    <a href="@Url.Action("Logout", "Account")" class="btn btn-danger">Logout</a>
+</div>
+

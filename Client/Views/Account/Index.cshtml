@@ -1,0 +1,11 @@
+﻿@model IEnumerable<Client.Models.Account>
+
+@{
+    ViewData["Title"] = null;
+}
+
+<h1>Welcome to Main Menu</h1>
+<p>Press login if you already have account and Register if you dont have account</p>
+
+<a href="@Url.Action("Loginn", "Account")" class="btn btn-primary">Login</a>
+<a href="@Url.Action("Registerr", "Account")" class="btn btn-outline-primary">Register</a>

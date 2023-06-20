@@ -7,7 +7,7 @@ namespace API.ViewModels.Employees;
         public Guid? Guid { get; set; }
 
     
-        [NIKEmailPhoneValidation(nameof(NIK))]
+       /* [NIKEmailPhoneValidation(nameof(NIK))]*/
         public string NIK { get; set; }
 
         [Required(ErrorMessage = "First Name is Required ")]    
@@ -18,10 +18,10 @@ namespace API.ViewModels.Employees;
         public DateTime HiringDate { get; set; }
 
         [EmailAddress]
-        [NIKEmailPhoneValidation(nameof(Email))]
+        /*[NIKEmailPhoneValidation(nameof(Email))]*/
         public string Email { get; set; }
 
         [Phone]
-        [NIKEmailPhoneValidation(nameof(PhoneNumber))]
+        /*[NIKEmailPhoneValidation(nameof(PhoneNumber))]*/
         public string PhoneNumber { get; set; }
 }

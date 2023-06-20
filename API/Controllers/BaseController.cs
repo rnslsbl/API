@@ -12,7 +12,7 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize (Roles = $"{nameof(RoleLevel.Admin)}, {nameof(RoleLevel.Manager)}")]
+    /*[Authorize(Roles = $"{nameof(RoleLevel.Admin)}, {nameof(RoleLevel.Manager)}")]*/
 
 
     public class BaseController<TModel, TViewModel> : ControllerBase
@@ -27,7 +27,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+       /* [Authorize]*/
         public IActionResult GetAll()
         {
             var models = _repository.GetAll();
